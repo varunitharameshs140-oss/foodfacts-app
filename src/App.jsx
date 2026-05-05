@@ -3,39 +3,40 @@ import SearchBar from './components/SearchBar'
 import FoodList from './components/FoodList'
 
 function App() {
-  const [hasSearched, setHasSearched] = useState(false)
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
+  const [hasSearched, setHasSearched] = useState(false)
 
   const handleSearch = async (query) => {
-    setLoading(true)
-    setHasSearched(true)
+  setLoading(true)
+  setHasSearched(true)
 
-    try {
-      const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&json=1&page_size=10`
+  // ✅ clear old results immediately
+  setResults([])
 
-      const res = await fetch(url)
-      const data = await res.json()
+  try {
+    const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&json=1&page_size=10`
 
-      const filtered = data.products.filter(
-        (p) => p.product_name && p.product_name.trim() !== ''
-      )
+    const res = await fetch(url)
+    const data = await res.json()
 
-      setResults(filtered)
+    const filtered = data.products.filter(
+      (p) => p.product_name && p.nutriments
+    )
 
-    } catch (error) {
-      console.error("Error:", error)
-    } finally {
-      setLoading(false)
-    }
+    setResults(filtered)
+
+  } catch (error) {
+    console.error("Error:", error)
+  } finally {
+    setLoading(false)
   }
-
+}
   return (
     <div>
       <h1>🥗 FoodFacts</h1>
 
       <SearchBar onSearch={handleSearch} />
-      
 
       {loading && <p>Loading...</p>}
 
@@ -47,7 +48,9 @@ function App() {
         <p>No results found</p>
       )}
 
-      <FoodList products={results} />
+      {!loading && results.length > 0 && (
+        <FoodList products={results} />
+      )}
     </div>
   )
 }
