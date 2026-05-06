@@ -1,32 +1,15 @@
-function FoodCard({ product }) {
-  const { product_name, brands, nutriments, image_small_url } = product
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
-  return (
-    <div className="food-card">
-
-      {/* Image */}
-      <img
-        src={image_small_url || "https://via.placeholder.com/100"}
-        alt={product_name}
-        width="100"
-      />
-
-      {/* Name */}
-      <h2>{product_name || "Unknown Product"}</h2>
-
-      {/* Brand */}
-      <p>Brand: {brands || "N/A"}</p>
-
-      {/* Nutrition */}
-      <p>
-  Calories: {Math.round(nutriments?.['energy-kcal_100g'] || 0)} kcal
-</p>
-      <p>Protein: {nutriments?.proteins_100g || 0} g</p>
-      <p>Carbs: {nutriments?.carbohydrates_100g || 0} g</p>
-      <p>Fat: {nutriments?.fat_100g || 0} g</p>
-
-    </div>
-  )
-}
-
-export default FoodCard
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      "/api": {
+        target: "https://world.openfoodfacts.org",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
+  },
+});
